@@ -15,6 +15,8 @@
 #define I2C_BUFFER_SIZE    5
 #define PSOC_SLAVE_ADDRESS 0x08
 
+#define DEBUG_VIA_UART // Comment this line to avoid UART logging
+
 // UART buffer
 char message[50];
 volatile uint8_t state = 0x00;
@@ -69,6 +71,7 @@ int main(void) {
         
         if ( state == 0x00 ) {
             I2C_Master_MasterClearStatus();
+            /* Read 1 (minimum) and up to 5 (max) bytes from I2C slave */
             error = I2C_Master_MasterReadBuf(PSOC_SLAVE_ADDRESS, rData, nbyteRead, I2C_Master_MODE_COMPLETE_XFER);
         
             if ( error != I2C_Master_MSTR_NO_ERROR ) {
@@ -84,7 +87,9 @@ int main(void) {
             
             /* Read complete */
             if ( state == 0x02 ) {
+                // Get number of bytes read from I2C slave
                 count = I2C_Master_MasterGetReadBufSize();
+                #ifdef DEBUG_VIA_UART
                 sprintf(message, "(%d) Data from I2C slave: ", count);
                 UART_1_PutString(message);
                 for ( uint8_t i = 0; i < count; i++ ) {
@@ -92,11 +97,17 @@ int main(void) {
                     UART_1_PutString(message);
                 }
                 UART_1_PutString("\r\n\r\n");
+                #endif
                 I2C_Master_MasterClearReadBuf();  
                 state = 0x00;
                 CyDelay(1500);
                 readCount++;
                 nbyteRead = ++nbyteRead > 5 ? 1 : nbyteRead; // Avoid overflow (read up to 5 bytes)
+            }
+            
+            /* Write complete */
+            if ( state == 0x03 ) {
+                // Put your code here...   
             }
             
         }
@@ -111,17 +122,17 @@ int main(void) {
 
 void I2C_Master_ISR_ExitCallback() {
            
-    uint8_t stat = I2C_Master_MasterStatus();
+    /*uint8_t stat = I2C_Master_MasterStatus();
     sprintf(message, "- 0x%02x \r\n", stat);
-    UART_1_PutString(message);
+    UART_1_PutString(message);*/
     
     /* Master Read Complete */
-    if ( stat & I2C_Master_MSTAT_RD_CMPLT ) {
+    if ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_RD_CMPLT ) {
         state = 0x02;
     }
     
     /* Master Write Complete */
-    if ( stat & I2C_Master_MSTAT_WR_CMPLT ) {
+    if ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_WR_CMPLT ) {
         state = 0x03;
     }
     
