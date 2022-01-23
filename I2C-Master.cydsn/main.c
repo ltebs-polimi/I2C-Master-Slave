@@ -15,6 +15,7 @@
 #define I2C_BUFFER_SIZE    5
 #define PSOC_SLAVE_ADDRESS 0x08
 
+
 int main(void) {
     
     CyGlobalIntEnable; /* Enable global interrupts. */
@@ -31,6 +32,8 @@ int main(void) {
     }
     I2C_Master_MasterSendStop();
     
+    CyDelay(100);
+    
     // UART buffer
     char message[50];
     // I2C error return code
@@ -44,7 +47,7 @@ int main(void) {
     I2C_Master_MasterClearStatus();
     uint8_t rData[I2C_BUFFER_SIZE];
     error = I2C_Master_MasterReadBuf(PSOC_SLAVE_ADDRESS, rData, I2C_BUFFER_SIZE, I2C_Master_MODE_COMPLETE_XFER);
-    //while ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_XFER_INP ); // wait for transfer to complete
+    while ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_XFER_INP ); // wait for transfer to complete
     if ( error == I2C_Master_MSTR_NO_ERROR ) {
         UART_1_PutString("Data from I2C slave: ");
         for ( uint8_t i = 0; i < I2C_BUFFER_SIZE; i++ ) {
@@ -53,24 +56,30 @@ int main(void) {
         }
         UART_1_PutString("\r\n");
     }
+    I2C_Master_MasterClearReadBuf();
     
     CyDelay(100);
+    
+    
     
     // Write to slave
     I2C_Master_MasterClearStatus();
-    uint8_t wData[I2C_BUFFER_SIZE] = {5,4,3,2,1};
+    uint8_t wData[I2C_BUFFER_SIZE] = {0x0A, 0x0B, 0x0C, 0x0D, 0x0E};
     error = I2C_Master_MasterWriteBuf(PSOC_SLAVE_ADDRESS, wData, I2C_BUFFER_SIZE, I2C_Master_MODE_COMPLETE_XFER);
-    //while ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_XFER_INP ) ; // wait for transfer to complete
+    while ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_XFER_INP ) ; // wait for transfer to complete
     if ( error == I2C_Master_MSTR_NO_ERROR ) {
         UART_1_PutString("Data written to I2C slave.\r\n");    
     }
+    I2C_Master_MasterClearWriteBuf();
     
     CyDelay(100);
     
-    // Read back slave buffer
+    
+    
+    // Read back slave buffer (partial read)
     I2C_Master_MasterClearStatus();
-    error = I2C_Master_MasterReadBuf(PSOC_SLAVE_ADDRESS, rData, I2C_BUFFER_SIZE, I2C_Master_MODE_COMPLETE_XFER);
-    //while ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_XFER_INP ); // wait for transfer to complete
+    error = I2C_Master_MasterReadBuf(PSOC_SLAVE_ADDRESS, rData, 5, I2C_Master_MODE_COMPLETE_XFER);
+    while ( I2C_Master_MasterStatus() & I2C_Master_MSTAT_XFER_INP ); // wait for transfer to complete
     if ( error == I2C_Master_MSTR_NO_ERROR ) {
         UART_1_PutString("Data from I2C slave: ");
         for ( uint8_t i = 0; i < I2C_BUFFER_SIZE; i++ ) {
@@ -79,6 +88,8 @@ int main(void) {
         }
         UART_1_PutString("\r\n");
     }
+    I2C_Master_MasterClearReadBuf();
+    
     
     return 0;
     

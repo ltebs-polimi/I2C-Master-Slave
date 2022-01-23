@@ -3,12 +3,14 @@
 <!--This file is machine generated and read. It is not intended to be edited by hand.-->
 <!--Due to this, there is no schema for this file.-->
 <CyGuid_2867d519-54d2-4c01-9830-c51cb08bc3dd type_name="CyDesigner.Common.ProjMgmt.Model.CyPrjMgmtWorkspaceSerialize" version="5" xml_contents_version="3" name="PSoC-I2C-Comm" persistent="PSoC-I2C-Comm.cywrk" platform="NOT_USED">
-<current_project name=".\I2C-Slave.cydsn\I2C-Slave.cyprj" />
+<current_project name=".\I2C-Master-Callback.cydsn\I2C-Master-Callback.cyprj" />
 <wrkspc_folders />
 <files />
 <projects>
 <v>.\I2C-Master.cydsn\I2C-Master.cyprj</v>
 <v>.\I2C-Slave.cydsn\I2C-Slave.cyprj</v>
+<v>.\I2C-Slave-Callback.cydsn\I2C-Slave-Callback.cyprj</v>
+<v>.\I2C-Master-Callback.cydsn\I2C-Master-Callback.cyprj</v>
 </projects>
 <workspace_id v="c12a9adc-93d8-4f4b-a3fa-66c02f2b4f45" />
 <WriteAppVersionLastSavedWith v="4.4.0.80" />
